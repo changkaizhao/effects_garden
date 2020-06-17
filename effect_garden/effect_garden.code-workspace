@@ -1,0 +1,49 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "explorer.confirmDelete": false,
+        "files.trimTrailingWhitespace": true,
+        "files.trimFinalNewlines": true,
+        "typescript.preferences.quoteStyle": "single",
+        "prettier.printWidth": 100,
+        "prettier.singleQuote": true,
+        "prettier.trailingComma": "es5",
+        "prettier.tabWidth": 4,
+        "prettier.htmlWhitespaceSensitivity": "strict",
+        "prettier.disableLanguages": ["vue"],
+        "files.associations": {
+            "*.cjson": "jsonc",
+            "*.wxss": "css",
+            "*.wxs": "javascript"
+        },
+        "editor.renderControlCharacters": true,
+        "editor.renderWhitespace": "all",
+        // prettier configuration
+        "[typescriptreact]": {
+            "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[javascript]": {
+            "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[typescript]": {
+            "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[json]": {
+            "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[html]": {
+            "editor.defaultFormatter": "vscode.html-language-features"
+        },
+        "[css]": {
+            "editor.defaultFormatter": "vscode.css-language-features"
+        },
+        "editor.formatOnSave": true,
+        "html.format.indentInnerHtml": true,
+        "prettier.useTabs": false,
+        "editor.detectIndentation": false
+    }
+}

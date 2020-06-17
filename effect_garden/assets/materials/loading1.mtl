@@ -1,0 +1,18 @@
+{
+  "__type__": "cc.Material",
+  "_name": "loading1",
+  "_objFlags": 0,
+  "_native": "",
+  "_effectAsset": {
+    "__uuid__": "fe7dc462-8ce9-4fa3-bc3c-52a705766267"
+  },
+  "_techniqueIndex": 0,
+  "_techniqueData": {
+    "0": {
+      "defines": {
+        "USE_TEXTURE": false,
+        "USE_LOADING_STYLE": true
+      }
+    }
+  }
+}

@@ -1,0 +1,164 @@
+// Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
+
+CCEffect %{
+  techniques:
+  - passes:
+    - vert: vs
+      frag: fs
+      blendState:
+        targets:
+        - blend: true
+      rasterizerState:
+        cullMode: none
+      properties:
+        texture: { value: white }
+        alphaThreshold: { value: 0.5 }
+        # u_num_dots: {
+        #   value: 14,
+        #   editor: {
+        #     tooltip: "圆点数量"
+        #   }
+        # }
+        u_dot_offset: {
+          value: 0.04,
+          editor: {
+            tooltip: "圆点的偏移"
+          }
+        }
+        u_speed: {
+          value: 0.2,
+          editor: {
+            tooltip: "圆点的速度"
+          }
+        }
+        u_power: {
+          value: 3.,
+          editor: {
+            tooltip: "圆点的力度"
+          }
+        }
+}%
+
+
+CCProgram vs %{
+  precision highp float;
+
+  #include <cc-global>
+  #include <cc-local>
+
+  in vec3 a_position;
+  in vec4 a_color;
+  out vec4 v_color;
+  out vec2 f_pos;
+  #if USE_TEXTURE
+  in vec2 a_uv0;
+  out vec2 v_uv0;
+  #endif
+
+  void main () {
+    vec4 pos = vec4(a_position, 1);
+
+    #if CC_USE_MODEL
+    pos = cc_matViewProj * cc_matWorld * pos;
+    #else
+    pos = cc_matViewProj * pos;
+    #endif
+
+    #if USE_TEXTURE
+    v_uv0 = a_uv0;
+    #endif
+
+    v_color = a_color;
+    f_pos = pos.xy;
+    gl_Position = pos;
+  }
+}%
+
+
+
+
+CCProgram fs %{
+  precision highp float;
+
+  #include <alpha-test>
+  #include <texture>
+  #include <cc-global>
+  #include <common>
+
+  in vec4 v_color;
+  in vec2 f_pos;
+
+  #if USE_TEXTURE
+  in vec2 v_uv0;
+  uniform sampler2D texture;
+  #endif
+
+  #if USE_LOADING_STYLE
+
+  uniform style{
+
+    // 圆点数量
+    // int u_num_dots;
+
+    // 圆点偏移
+    float u_dot_offset;
+
+    // 圆点速度
+    float u_speed;
+
+    // 圆点力度
+    float u_power;
+  };
+
+
+  float smin( float a, float b, float k ){
+        float h = clamp( 0.5+0.5*(b-a)/k, 0.0, 1.0 );
+        return mix( b, a, h ) - k*h*(1.0-h);
+  }
+
+  #endif
+
+  void main () {
+    vec4 o = vec4(1, 1, 1, 1);
+
+    #if USE_TEXTURE
+      CCTexture(texture, v_uv0, o);
+    #endif
+    #if USE_LOADING_STYLE
+
+    vec3 COLTOP = vec3(.3,0.6,1.);
+    vec3 COLBTM = vec3(1.,.4,.3);
+
+    vec2 uv = f_pos -vec2(.2,0);
+    // uv.x *= cc_screenSize.x/cc_screenSize.y;
+    uv.x *= 1.5;
+    // o = vec4(uv.x, uv.y, 0 , 1);
+
+    float d = 9999.;
+    vec3 col;
+    const int dots = 14; //圆点数量
+
+    for (int i=0;i<dots;i++) {
+    	float t = pow(fract(cc_time.x*u_speed+(float(i)*u_dot_offset)),u_power);
+    	float s = PI*2.;
+    	vec2 oo = vec2(sin(t*s), cos(t*s))*.2;
+        float dist = length(uv+oo)-.01;
+        if (dist<d){
+        	col=mix(COLTOP,COLBTM, cos(t*s)*.5+.5);
+        }
+    	d = smin(d, dist, 0.04);
+    }
+    col = mix(col, vec3(1.,1.,.9), smoothstep(0., 0.005, d));
+
+    // Output to screen
+    o = vec4(col,1.0);
+    #endif
+
+
+    o *= v_color;
+
+    ALPHA_TEST(o);
+
+    gl_FragColor = o;
+  }
+}%

@@ -1,0 +1,22 @@
+{
+  "__type__": "cc.Material",
+  "_name": "background1",
+  "_objFlags": 0,
+  "_native": "",
+  "_effectAsset": {
+    "__uuid__": "6dc9b598-4946-4d32-93e4-3be30d95667d"
+  },
+  "_techniqueIndex": 0,
+  "_techniqueData": {
+    "0": {
+      "defines": {
+        "USE_TEXTURE": false
+      },
+      "props": {
+        "texture": {
+          "__uuid__": "8c304f57-1d54-459d-83b0-473ada613a91"
+        }
+      }
+    }
+  }
+}
