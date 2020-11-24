@@ -9,6 +9,10 @@ export default class MainController extends cc.Component {
     background1: cc.Button = null;
     @property(cc.Button)
     loading1: cc.Button = null;
+    @property(cc.Button)
+    outline: cc.Button = null;
+    @property(cc.Button)
+    split: cc.Button = null;
     @property(cc.Node)
     showWindow: cc.Node = null;
 
@@ -30,10 +34,16 @@ export default class MainController extends cc.Component {
         this.loading1.node.on('click', () => {
             this._show(this.loading1.node.name);
         });
+        this.outline.node.on('click', () => {
+            this._show(this.outline.node.name);
+        });
+        this.split.node.on('click', () => {
+            this._show(this.split.node.name);
+        });
     }
 
     start() {
-        console.log(this.showWindow.width, this.showWindow.height);
+        // console.log(this.showWindow.width, this.showWindow.height);
     }
 
     // update (dt) {}

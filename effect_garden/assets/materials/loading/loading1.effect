@@ -13,6 +13,10 @@ CCEffect %{
       properties:
         texture: { value: white }
         alphaThreshold: { value: 0.5 }
+        s_windowSize: {value: [1.,1.]}
+        s_offset: {value: [0.,0.]}
+        s_time: {value: 0.}
+
         # u_num_dots: {
         #   value: 14,
         #   editor: {
@@ -82,7 +86,6 @@ CCProgram fs %{
 
   #include <alpha-test>
   #include <texture>
-  #include <cc-global>
   #include <common>
 
   in vec4 v_color;
@@ -93,6 +96,11 @@ CCProgram fs %{
   uniform sampler2D texture;
   #endif
 
+    uniform info{
+        vec2 s_windowSize;
+        vec2 s_offset;
+        float s_time;
+    };
   #if USE_LOADING_STYLE
 
   uniform style{
@@ -118,43 +126,50 @@ CCProgram fs %{
 
   #endif
 
+  vec2 normalizeUV(){
+    vec2 uv = f_pos - s_offset;//vec2(125./480.,0);
+    uv.x *= s_windowSize.x/s_windowSize.y;
+    return uv;
+  }
+
   void main () {
     vec4 o = vec4(1, 1, 1, 1);
 
     #if USE_TEXTURE
       CCTexture(texture, v_uv0, o);
     #endif
+
     #if USE_LOADING_STYLE
 
     vec3 COLTOP = vec3(.3,0.6,1.);
     vec3 COLBTM = vec3(1.,.4,.3);
 
-    vec2 uv = f_pos -vec2(.2,0);
-    // uv.x *= cc_screenSize.x/cc_screenSize.y;
-    uv.x *= 1.5;
-    // o = vec4(uv.x, uv.y, 0 , 1);
+    vec3 COLBG = vec3(0.,0.,0.);
+    float SCALE = 0.2;
 
-    float d = 9999.;
+    // f_pos 原点并不是当前节点中心原点, 而是全局中心点
+    vec2 uv = normalizeUV();
+
+    float d = 999999.;
     vec3 col;
-    const int dots = 14; //圆点数量
+    const int dots = 15; //圆点数量
 
     for (int i=0;i<dots;i++) {
-    	float t = pow(fract(cc_time.x*u_speed+(float(i)*u_dot_offset)),u_power);
+    	float t = pow(fract(s_time*u_speed+(float(i)*u_dot_offset)),u_power);
     	float s = PI*2.;
-    	vec2 oo = vec2(sin(t*s), cos(t*s))*.2;
+    	vec2 oo = vec2(sin(t*s), cos(t*s))*SCALE;
         float dist = length(uv+oo)-.01;
         if (dist<d){
         	col=mix(COLTOP,COLBTM, cos(t*s)*.5+.5);
         }
-    	d = smin(d, dist, 0.04);
+    	d = smin(d, dist, 0.05);
     }
-    col = mix(col, vec3(1.,1.,.9), smoothstep(0., 0.005, d));
+    col = mix(col, COLBG, smoothstep(0., 0.005, d));
 
     // Output to screen
     o = vec4(col,1.0);
+
     #endif
-
-
     o *= v_color;
 
     ALPHA_TEST(o);

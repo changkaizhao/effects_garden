@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.  
+// Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
 
 CCEffect %{
   techniques:
@@ -13,6 +13,9 @@ CCEffect %{
       properties:
         texture: { value: white }
         alphaThreshold: { value: 0.5 }
+        s_windowSize: {value: [1.,1.]}
+        s_offset: {value: [0.,0.]}
+        s_time: {value: 0.}
 }%
 
 
@@ -53,10 +56,9 @@ CCProgram vs %{
 
 CCProgram fs %{
   precision highp float;
-  
+
   #include <alpha-test>
   #include <texture>
-  #include <cc-global>
 
   in vec4 v_color;
   in vec2 f_pos;
@@ -64,24 +66,27 @@ CCProgram fs %{
   in vec2 v_uv0;
   uniform sampler2D texture;
   #endif
+    uniform info{
+        vec2 s_windowSize;
+        vec2 s_offset;
+        float s_time;
+    };
 
+ vec2 normalizeUV(){
+    vec2 uv = f_pos - s_offset;//vec2(125./480.,0);
+    uv.x *= s_windowSize.x/s_windowSize.y;
+    return uv;
+  }
+  
   void main () {
     vec4 o = vec4(1, 1, 1, 1);
 
     #if USE_TEXTURE
-      // CCTexture(texture, v_uv0, o);
-      // cc_time.x 决定变化速率
-    // o = vec4(col, 1.0);
+      CCTexture(texture, v_uv0, o);
     #endif
-
-    // f_pos就是 片元位置 （0，1） 
-    vec3 col = 0.5 + 0.5*cos(cc_time.x+f_pos.xyx+vec3(0,2,4));
-
-    // vec2 uv = f_pos/cc_screenSize.xy;
+    vec2 uv = normalizeUV();
+    vec3 col = 0.5 + 0.5*cos(s_time+uv.xyx+vec3(0,2,4));
     o = vec4(col, 1.0);
-    // // Time varying pixel color
-
-    
     // o *= v_color;
     ALPHA_TEST(o);
 
